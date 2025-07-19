@@ -1,0 +1,17 @@
+# Environment variables
+.env
+
+# Go binaries and build artifacts
+*.exe
+*.test
+*.out
+bin/
+tmp/
+
+# Dependency directories (if using vendoring)
+vendor/
+
+# IDE and OS specific files
+.DS_Store
+.vscode/
+.idea/
