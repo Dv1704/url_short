@@ -48,3 +48,5 @@ This project highlights backend engineering skills including:
 * Real-world architecture practices
 
 Whether you're a recruiter evaluating backend capabilities or a developer looking for inspiration, this URL shortener showcases production-level backend design with clarity, security, and scalability at its core.
+🔗 [View Full API Documentation](https://.postman.co/workspace/deevictor~332aa9cb-c83d-44c7-9d2e-32a5782b1309/collection/29434244-fd235b1a-6d41-4d1f-ad42-d66b0e9d34d0?action=share&creator=29434244&active-environment=29434244-05fa3ce9-3898-426a-a099-e415c16c1e4a
+)
