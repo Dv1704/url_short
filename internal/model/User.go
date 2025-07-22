@@ -3,17 +3,20 @@ package model
 import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	"time"
 )
 
 type User struct {
-	gorm.Model
-	Name     string `gorm:"size:255;not null" json:"name"`
-	Email    string `gorm:"uniqueIndex;not null" json:"email"`
-	URLs     []URL  `gorm:"foreignKey:UserID" json:"urls"`
-	Password string `gorm:"not null" json:"-"` // Hide password in API
+	ID        uint           `gorm:"primaryKey" json:"id"`
+	Name      string         `json:"name"`
+	Email     string         `gorm:"uniqueIndex;not null" json:"email"`
+	Password  string         `json:"password"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
-// Hash password before creating
+// Hash the password before creating the user
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
