@@ -7,10 +7,13 @@
   },
   "servers": [
     {
-      "url": "https://url-shortner-latest-2.onrender.com",
+      "url": "https://url-short-eyjw.onrender.com",
       "description": "Production Server"
     },
-    { "url": "http://localhost:3000", "description": "Local Development" }
+    {
+      "url": "http://localhost:3000",
+      "description": "Local Development"
+    }
   ],
   "paths": {
     "/api/v0/signup": {
@@ -138,7 +141,7 @@
                     },
                     "short": {
                       "type": "string",
-                      "example": "https://short.ly/abc123"
+                      "example": "https://url-short-eyjw.onrender.com/abc123"
                     },
                     "redirect_count": { "type": "integer", "example": 0 },
                     "created_at": {
