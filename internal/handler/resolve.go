@@ -8,26 +8,21 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// ResolveURL handles redirection from short URL to original
+// ResolveURL handles redirection from short code to original URL
 func ResolveURL(c *fiber.Ctx) error {
 	short := c.Params("url")
 
 	var url model.URL
-	result := db.DB.Where("short_url = ?", short).First(&url)
+	result := db.DB.Where("short_code = ?", short).First(&url)
 	if result.Error != nil {
-		if result.Error.Error() == "record not found" {
-			return c.Status(http.StatusNotFound).JSON(fiber.Map{
-				"error": "Short URL not found",
-			})
-		}
-		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Database query failed",
+		return c.Status(http.StatusNotFound).JSON(fiber.Map{
+			"error": "Short URL not found",
 		})
 	}
 
-	// Increment redirect count
+	// Increment redirect count (optional)
 	url.RedirectCount++
 	db.DB.Save(&url)
 
-	return c.Redirect(url.OriginalURL, http.StatusMovedPermanently) // 301
+	return c.Redirect(url.OriginalURL, http.StatusMovedPermanently) // 301 redirect
 }

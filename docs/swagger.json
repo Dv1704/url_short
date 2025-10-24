@@ -1,0 +1,278 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "URL Shortener API",
+    "version": "1.0.0",
+    "description": "A RESTful API for shortening URLs, managing user accounts, and tracking URL analytics."
+  },
+  "servers": [
+    {
+      "url": "https://url-shortner-latest-2.onrender.com",
+      "description": "Production Server"
+    },
+    { "url": "http://localhost:3000", "description": "Local Development" }
+  ],
+  "paths": {
+    "/api/v0/signup": {
+      "post": {
+        "summary": "User Signup",
+        "description": "Register a new user account using a username, email, and password.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string", "example": "john_doe" },
+                  "email": { "type": "string", "example": "john@example.com" },
+                  "password": { "type": "string", "example": "secret123" }
+                },
+                "required": ["username", "email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Account successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User created successfully"
+                    },
+                    "success": { "type": "boolean", "example": true }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid input or existing email" }
+        }
+      }
+    },
+    "/api/v0/login": {
+      "post": {
+        "summary": "User Login",
+        "description": "Authenticate user and return JWT token for authorization.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "example": "john@example.com" },
+                  "password": { "type": "string", "example": "secret123" }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful login",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "token": { "type": "string", "example": "jwt_token_here" },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "integer", "example": 1 },
+                        "email": {
+                          "type": "string",
+                          "example": "john@example.com"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Invalid email or password" }
+        }
+      }
+    },
+    "/api/v0/shorten": {
+      "post": {
+        "summary": "Shorten a Long URL",
+        "description": "Generate a short URL from a long one. Requires authentication.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "example": "https://example.com/very/long/url"
+                  }
+                },
+                "required": ["url"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "URL successfully shortened",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "example": "https://example.com/very/long/url"
+                    },
+                    "short": {
+                      "type": "string",
+                      "example": "https://short.ly/abc123"
+                    },
+                    "redirect_count": { "type": "integer", "example": 0 },
+                    "created_at": {
+                      "type": "string",
+                      "example": "2025-10-24T10:00:00Z"
+                    },
+                    "rate_limit": { "type": "integer", "example": 10 },
+                    "rate_limit_reset": {
+                      "type": "integer",
+                      "example": 1735046400
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid URL or rate limit exceeded" }
+        }
+      }
+    },
+    "/api/v0/my-urls": {
+      "get": {
+        "summary": "Get All URLs for a User",
+        "description": "Retrieve all shortened URLs belonging to the authenticated user.",
+        "responses": {
+          "200": {
+            "description": "List of URLs retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "urls": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "ID": { "type": "integer", "example": 1 },
+                          "ShortCode": {
+                            "type": "string",
+                            "example": "abc123"
+                          },
+                          "OriginalURL": {
+                            "type": "string",
+                            "example": "https://example.com/page"
+                          },
+                          "RedirectCount": { "type": "integer", "example": 5 },
+                          "CreatedAt": {
+                            "type": "string",
+                            "example": "2025-10-24T09:00:00Z"
+                          },
+                          "UpdatedAt": {
+                            "type": "string",
+                            "example": "2025-10-25T10:00:00Z"
+                          },
+                          "expires_at": {
+                            "type": "string",
+                            "example": "2025-11-01T00:00:00Z"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized - token missing or invalid" }
+        }
+      }
+    },
+    "/api/v0/url/{id}": {
+      "delete": {
+        "summary": "Delete a Shortened URL",
+        "description": "Allows a user to delete their own shortened URL.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 3 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "URL deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "URL deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "URL not found" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/{shortCode}": {
+      "get": {
+        "summary": "Redirect Short URL",
+        "description": "Redirects to the original long URL using the short code.",
+        "parameters": [
+          {
+            "name": "shortCode",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "example": "abc123" }
+          }
+        ],
+        "responses": {
+          "302": { "description": "Redirects to the long URL" },
+          "404": { "description": "Short URL not found" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [{ "bearerAuth": [] }]
+}
