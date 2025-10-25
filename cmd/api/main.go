@@ -12,7 +12,7 @@ import (
 	"github.com/dv1704/url_short/internal/db"
 	"github.com/dv1704/url_short/internal/router"
 
-	_ "github.com/dv1704/url_short/docs"
+	_ "github.com/dv1704/url_short/docs" // Ensure docs are included
 	"github.com/gofiber/swagger"
 )
 
@@ -45,16 +45,17 @@ func main() {
 	// Setup API routes
 	router.SetupRoutes(app)
 
-	// Serve Swagger JSON/YAML as static files
+	// Serve Swagger specification files
 	app.Static("/docs/swagger.json", "./docs/swagger.json")
 	app.Static("/docs/swagger.yaml", "./docs/swagger.yaml")
 
-	// Serve Swagger UI at /docs
-	app.Get("/docs", swagger.New(swagger.Config{
-		URL: "/docs/swagger.json",
+	// ✅ CORRECT WAY: Mount Swagger UI middleware on the /docs prefix
+	// This handles /docs, /docs/, and all Swagger UI assets (JS, CSS, etc.)
+	app.Use("/docs", swagger.New(swagger.Config{
+		URL: "/docs/swagger.json", // URL to your spec
 	}))
 
-	// Get port from Render environment or fallback
+	// Get port from environment (e.g., Render)
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
