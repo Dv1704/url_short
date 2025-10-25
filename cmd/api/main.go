@@ -12,7 +12,8 @@ import (
 	"github.com/dv1704/url_short/internal/db"
 	"github.com/dv1704/url_short/internal/router"
 
-	_ "github.com/dv1704/url_short/docs" // Ensure docs are included
+	// Import docs package (required for swag)
+	_ "github.com/dv1704/url_short/docs"
 	"github.com/gofiber/swagger"
 )
 
@@ -45,15 +46,17 @@ func main() {
 	// Setup API routes
 	router.SetupRoutes(app)
 
-	// Serve Swagger specification files
-	app.Static("/docs/swagger.json", "./docs/swagger.json")
-	app.Static("/docs/swagger.yaml", "./docs/swagger.yaml")
-
-	// ✅ CORRECT WAY: Mount Swagger UI middleware on the /docs prefix
-	// This handles /docs, /docs/, and all Swagger UI assets (JS, CSS, etc.)
-	app.Use("/docs", swagger.New(swagger.Config{
-		URL: "/docs/swagger.json", // URL to your spec
-	}))
+	// 🔒 Only serve Swagger if swagger.json exists (avoids 404s & redirect loops)
+	if _, err := os.Stat("./docs/swagger.json"); err == nil {
+		app.Static("/docs/swagger.json", "./docs/swagger.json")
+		app.Static("/docs/swagger.yaml", "./docs/swagger.yaml")
+		app.Use("/docs", swagger.New(swagger.Config{
+			URL: "/docs/swagger.json",
+		}))
+		log.Println("✅ Swagger UI enabled at /docs")
+	} else {
+		log.Println("⚠️  Swagger disabled: ./docs/swagger.json not found")
+	}
 
 	// Get port from environment (e.g., Render)
 	port := os.Getenv("PORT")
