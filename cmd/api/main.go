@@ -56,4 +56,12 @@ func main() {
 
 	log.Printf("🚀 Server running on port %s", port)
 	log.Fatal(app.Listen(":" + port))
+
+
+	app.Get("/debug", func(c *fiber.Ctx) error {
+    if _, err := os.Stat("docs/swagger.json"); err != nil {
+        return c.SendString("MISSING")
+    }
+    return c.SendString("FOUND")
+})
 }
