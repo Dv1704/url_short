@@ -45,11 +45,10 @@ func main() {
 	// Setup API routes
 	router.SetupRoutes(app)
 
-	// Serve Swagger JSON/YAML
-	app.Static("/docs/swagger.json", "./docs/swagger.json")
-	app.Static("/docs/swagger.yaml", "./docs/swagger.yaml")
+	// ✅ Serve entire docs folder (Swagger JSON + YAML)
+	app.Static("/docs", "./docs")
 
-	// Serve Swagger UI
+	// ✅ Serve Swagger UI
 	app.Get("/docs/*", swagger.New(swagger.Config{
 		URL: "/docs/swagger.json", // Path to Swagger JSON
 	}))
