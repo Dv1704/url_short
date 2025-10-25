@@ -12,17 +12,17 @@ import (
 	"github.com/dv1704/url_short/internal/db"
 	"github.com/dv1704/url_short/internal/router"
 
+	_ "github.com/dv1704/url_short/docs" // 👈 Import generated Swagger docs
 	"github.com/gofiber/swagger"
 )
 
 func main() {
-	// Load env variables
-	err := godotenv.Load()
-	if err != nil {
+	// Load environment variables
+	if err := godotenv.Load(); err != nil {
 		log.Printf("⚠️  .env not found: %v", err)
 	}
 
-	// Initialize DB
+	// Initialize database
 	db.InitDB()
 	database := db.GetDB()
 	sqlDB, err := database.DB()
@@ -31,10 +31,12 @@ func main() {
 	}
 	defer sqlDB.Close()
 
+	// Initialize Fiber app
 	app := fiber.New()
 	app.Use(logger.New())
 	app.Use(cors.New())
 
+	// Attach DB instance to context
 	app.Use(func(c *fiber.Ctx) error {
 		c.Locals("db", database)
 		return c.Next()
@@ -43,14 +45,16 @@ func main() {
 	// Setup API routes
 	router.SetupRoutes(app)
 
-	// Serve swagger.json from the docs directory
+	// ✅ Serve Swagger JSON/YAML first
 	app.Static("/docs/swagger.json", "./docs/swagger.json")
+	app.Static("/docs/swagger.yaml", "./docs/swagger.yaml")
 
-	// Serve Swagger UI using the correct JSON file
+	// ✅ Serve Swagger UI after static routes
 	app.Get("/docs/*", swagger.New(swagger.Config{
-		URL: "/docs/swagger.json", // URL to the Swagger JSON
+		URL: "/docs/swagger.json", // Path to the Swagger JSON
 	}))
 
+	// Get port from environment or default to :3000
 	port := os.Getenv("APP_PORT")
 	if port == "" {
 		port = ":3000"
