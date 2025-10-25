@@ -45,13 +45,13 @@ func main() {
 	// Setup API routes
 	router.SetupRoutes(app)
 
-	// ✅ Serve Swagger JSON as static file
+	// Serve Swagger JSON/YAML as static files
 	app.Static("/docs/swagger.json", "./docs/swagger.json")
 	app.Static("/docs/swagger.yaml", "./docs/swagger.yaml")
 
-	// ✅ Serve Swagger UI at /docs/index.html
-	app.Get("/docs/index.html", swagger.New(swagger.Config{
-		URL: "/docs/swagger.json", // Must match the static JSON URL
+	// Serve Swagger UI at /docs
+	app.Get("/docs", swagger.New(swagger.Config{
+		URL: "/docs/swagger.json",
 	}))
 
 	// Get port from Render environment or fallback
